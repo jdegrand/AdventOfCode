@@ -5,25 +5,6 @@ input = File.read(file)
 
 $lines = input.split("\n\n")
 
-def evaluate(rules, rule)
-    if rules[rule][0] == "a" || rules[rule][0] == "b"
-        return rules[rule]
-    end
-    if rules[rule].is_a?(Array)
-        poss = []
-        rules[rule].each_with_index do |r, i|
-            r.each_with_index do |n, j|
-                if j == 0
-                    poss += [evaluate(rules, n)]
-                else
-                    poss[i] = poss[i].product([evaluate(rules, n)])
-                end
-            end
-        end
-        return poss.map{|p| p}
-    end
-end
-
 def day19_1
     rules = {}
     reg = /\A(\d+): (.+)\Z/
