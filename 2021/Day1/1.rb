@@ -26,6 +26,15 @@ def day1_2
     bigger
 end
 
-pp day1_1
-pp day1_2
+def day1_2_cooler
+    prev = 1.0 / 0
+    $lines.each_cons(3).count{|w|
+        curr = w.sum
+        temp = prev
+        prev = curr
+        curr > temp
+    }
+end
 
+pp day1_1
+pp day1_2_cooler
