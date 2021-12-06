@@ -20,7 +20,7 @@ def day6_2
     fish = Hash.new(0)
     fishTemp = $lines[0].split(?,).map(&:to_i)
     fishTemp.each{|f| fish[f] += 1}
-    256.times do |i|
+    256.times do
         n = 7
         last = fish[8]
         temp = -1
