@@ -24,7 +24,7 @@ def dfs(points, r, c, v)
     stack = []
     visited = Set.new
     count = 1
-    adj = [[0,1],[1,0],[0, -1], [-1,0]]
+    adj = [[0, 1], [1, 0], [0, -1], [-1, 0]]
     stack << [r,c] if v != 9 
     visited << [r,c] 
     depth = 0
@@ -43,7 +43,7 @@ end
 
 def day9_2
     points = Hash.new(Float::INFINITY)
-    adj = [[0,1],[1,0],[0, -1], [-1,0]]
+    adj = [[0, 1], [1, 0], [0, -1], [-1, 0]]
     $lines.each_with_index do |l, r|
         l.chars.each_with_index do |p, c|
             points[[r, c]] = p.to_i
