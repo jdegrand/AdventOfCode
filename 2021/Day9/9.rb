@@ -27,7 +27,6 @@ def dfs(points, r, c, v)
     adj = [[0, 1], [1, 0], [0, -1], [-1, 0]]
     stack << [r,c] if v != 9 
     visited << [r,c] 
-    depth = 0
     until stack.length == 0
         cr, cc = stack.shift
         adj.each do |dx, dy|
