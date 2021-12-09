@@ -7,7 +7,7 @@ $lines = input.lines.map(&:chomp)
 
 def day9_1
     points = Hash.new(Float::INFINITY)
-    adj = [[0,1],[1,0],[0, -1], [-1,0]]
+    adj = [[0, 1], [1, 0],[0, -1], [-1, 0]]
     $lines.each_with_index do |l, r|
         l.chars.each_with_index do |p, c|
             points[[r, c]] = p.to_i
