@@ -67,4 +67,3 @@ end
 
 pp day11_1
 pp day11_2
-
