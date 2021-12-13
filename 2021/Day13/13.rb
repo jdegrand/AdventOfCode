@@ -22,39 +22,18 @@ def day13_1
     inst = instructions[0].split[-1]
     dir, bound = inst.split("=")
     bound = bound.to_i
-    to_fold = []
     if dir == ?y
         (bound+1..maxy).each do |y|
-            row = []
             (minx..maxx).each do |x|
-                row << paper[[x, y]]
+                paper[[x, y - ((y - bound) * 2)]] = ?# if paper[[x, y]] == ?#
                 paper.delete([x, y])
-                paper.delete([x, bound])
-            end
-            to_fold << row
-        end
-        to_fold = to_fold.reverse
-        diff = maxx - bound
-        (0...to_fold.length).each do |y|
-            (0...to_fold[0].length).each do |x|
-                paper[[bound - diff + y, y]] = ?# if to_fold[y][x] == ?#
             end
         end
     else
         (miny..maxy).each do |y|
-            row = []
             (bound+1..maxx).each do |x|
-                row << paper[[x, y]]
+                paper[[x - ((x - bound) * 2), y]] = ?# if paper[[x, y]] == ?#
                 paper.delete([x, y])
-            end
-            paper.delete([bound, y])
-            to_fold << row
-        end
-        to_fold = to_fold.map{|r| r.reverse}
-        diff = maxx - bound
-        (0...to_fold.length).each do |y|
-            (0...to_fold[0].length).each do |x|
-                paper[[bound - diff + x, y]] = ?# if to_fold[y][x] == ?#
             end
         end
     end
@@ -103,9 +82,9 @@ def day13_2
         (minx..maxx).each do |x|
             row += paper[[x, y]]
         end
-        pp row
+        puts row.gsub(?., " ")
     end
 end
 
 pp day13_1
-pp day13_2
+day13_2
