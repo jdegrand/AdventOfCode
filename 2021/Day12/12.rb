@@ -15,7 +15,6 @@ def day12_1
     end
     stack = [["start"]]
     visited = Set.new
-    back = {}
     while stack.any?
         curr = stack.shift
         visited << curr
@@ -47,7 +46,6 @@ def day12_2
     small_caves.each do |sc|
         stack = [["start"]]
         visited = Set.new
-        back = {}
         while stack.any?
             curr = stack.shift
             visited << curr
