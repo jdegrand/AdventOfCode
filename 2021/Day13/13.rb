@@ -82,7 +82,7 @@ def day13_2
         (minx..maxx).each do |x|
             row += paper[[x, y]]
         end
-        puts row.gsub(?., " ")
+        puts row.gsub(?., "  ").gsub(?#, ?⬜)
     end
 end
 
