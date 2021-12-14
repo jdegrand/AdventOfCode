@@ -6,7 +6,7 @@ input = File.read(file)
 $lines = input.lines.map(&:chomp)
 
 def day14_1
-    poly = "NNCB"
+    poly = "NNSOFOCNHBVVNOBSBHCB"
     polys = [poly]
     rules = {}
     $lines.each do |l|
@@ -41,7 +41,7 @@ def day14_2
     poly_string.chars.each_cons(2) do |x|
         adj[x.join] += 1
     end
-    
+
     new_adj = []
     40.times do |t|
         new_adj = Hash.new(0)
