@@ -33,6 +33,8 @@ def day14_2
     poly_string = "NNSOFOCNHBVVNOBSBHCB"
     rules = {}
     letters = Hash.new(0)
+    letters.merge!(poly_string.chars.tally)
+
     $lines.each do |l|
         l, r = l.split(" -> ")
         rules[l] = r
