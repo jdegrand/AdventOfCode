@@ -1,3 +1,5 @@
+require 'set'
+
 file = 'input.txt'
 input = File.read(file)
 
@@ -25,6 +27,41 @@ def day14_1
     min, max = counts.map{|_, v| v}.minmax
     max - min
 end
+
+def day14_2
+    adj = Hash.new(0)
+    poly_string = "NNSOFOCNHBVVNOBSBHCB"
+    rules = {}
+    letters = Hash.new(0)
+    $lines.each do |l|
+        l, r = l.split(" -> ")
+        rules[l] = r
+    end
+
+    poly_string.chars.each_cons(2) do |x|
+        adj[x.join] += 1
+    end
+    
+    new_adj = []
+    40.times do |t|
+        new_adj = Hash.new(0)
+        adj.each do |k, v|
+            new_adj[[k[0], rules[k]].join] += v
+            new_adj[[rules[k], k[1]].join] += v
+            letters[rules[k]] += v
+        end
+        adj = new_adj
+    end
+    min, max = letters.map{|_, v| v}.minmax
+    max - min
+end
+
+pp day14_1
+pp day14_2
+
+
+
+# EXTRA CODE
 
 class Node
     def initialize(value)
@@ -72,9 +109,6 @@ class Linked
         end
         min, max = counts.map{|_, v| v}.minmax
         max - min
-        counts.sort_by{|k, v| k}
-        # counts
-        # [min, max]
     end
 
     def print
@@ -90,60 +124,3 @@ class Linked
     attr_accessor :head
     attr_accessor :length
 end
-
-def day14_2
-    poly_string = "NNSOFOCNHBVVNOBSBHCB"
-    rules = {}
-    $lines.each do |l|
-        l, r = l.split(" -> ")
-        rules[l] = r
-    end
-
-    prev = nil
-    poly = Linked.new(Node.new(poly_string[0]), rules);
-    poly_string[1..].chars.each do |c|
-       node = Node.new(c)
-       poly.insert(node)
-    end
-
-    results = []
-    10.times do |t|
-        poly.step
-        results << poly.get_result
-        pp "#{t} #{results[-1]}"
-    end
-    results
-end
-
-pp day14_1
-pp day14_2
-
-# res = [5,
-# 10,
-# 23,
-# 54,
-# 104,
-# 216,
-# 462,
-# 935,
-# 1922,
-# 3906,
-# 8042,
-# 16200,
-# 32818,
-# 65868,
-# 132545,
-# 265621,
-# 532278,
-# 1065347,
-# 2131750,
-# 4263987]
-
-# res.each do |r1|
-#     res.each do |r2|
-#         if r1 != r2
-#             pp "#{r1}, #{r2}" if r1 % r2 == 0
-#             pp "#{r1}, #{r2}" if r2 % r1 == 0
-#         end
-#     end
-# end
