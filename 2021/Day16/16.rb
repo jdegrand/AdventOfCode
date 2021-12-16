@@ -25,33 +25,46 @@ BITS = {
 def parse(bits, versions)
     version = bits.shift(3).join.to_i(2)
     typeID = bits.shift(3).join.to_i(2)
-
     versions << version
-
     if typeID == 4
-         _, *a = bits.shift(5)
-        _, *b = bits.shift(5)
-        _, *c = bits.shift(5)
-        bits.shift(3)
-        # pp (a + b + c).join.to_i(2)
+        chunks = []
+        pref, *chunk = bits.shift(5)
+        chunks << chunk
+        while pref == ?1
+            pref, *chunk = bits.shift(5)
+            chunks << chunk
+        end
+        return chunks.join.to_i(2)
     else
+        subpackets = []
         lengthTypeID = bits.shift
         if lengthTypeID == ?0
             length = bits.shift(15).join.to_i(2)
-            # pp length
             target_length = bits.length - length
-            # pp target_length
-            # pp bits.length
-            until bits.length >= target_length
-                # pp "#{length}, #{bits.length}, #{target_length}"
-                parse(bits, versions)
+            until bits.length == target_length
+                subpackets << parse(bits, versions)
             end
         elsif lengthTypeID == ?1
-            subpackets = bits.shift(11).join.to_i(2)
-            # pp subpackets
-            subpackets.times do
-                parse(bits, versions)
+            subpackets_length = bits.shift(11).join.to_i(2)
+            subpackets_length.times do
+                subpackets << parse(bits, versions)
             end
+        end
+        case typeID
+        when 0
+            return subpackets.sum
+        when 1
+            return subpackets.reduce(:*)
+        when 2
+            return subpackets.min
+        when 3
+            return subpackets.max
+        when 5
+            return subpackets[0] > subpackets[1] ? 1 : 0
+        when 6
+            return subpackets[0] < subpackets[1] ? 1 : 0
+        when 7
+            return subpackets[0] == subpackets[1] ? 1 : 0
         end
     end
 end
@@ -62,17 +75,22 @@ def day16_1
         bits << BITS[c].chars
     end
     bits.flatten!
-
     versions = []
-    while bits.any?
-       parse(bits, versions)
-    end
+
+    parse(bits, versions)
+    
     versions.sum
 end
 
 def day16_2
+    bits = []
+    $lines[0].chars.each do |c|
+        bits << BITS[c].chars
+    end
+    bits.flatten!
+
+    parse(bits, [])
 end
 
 pp day16_1
 pp day16_2
-
