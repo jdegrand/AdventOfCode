@@ -33,7 +33,7 @@ def day17
     vy = 2
 
     maxy_list = []  
-    (1...xbound).each do |vx|
+    (1..xbound).each do |vx|
         (ybound+1..1000).each do |vy|
             compute(vx, vy, maxy_list, xs, ys, xbound, ybound)
         end
