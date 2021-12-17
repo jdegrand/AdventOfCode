@@ -29,9 +29,6 @@ def day17
     xbound = [x0, x1].max + 1
     ybound = [y0, y1].min - 1
 
-    vx = 7
-    vy = 2
-
     maxy_list = []  
     (1..xbound).each do |vx|
         (ybound+1..1000).each do |vy|
