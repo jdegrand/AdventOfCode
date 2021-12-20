@@ -11,10 +11,7 @@ def get_orientations(scanners)
         combs = {}
         [0,1,2].each do |v|
             s = scanner.map{|r| r.rotate(v)}
-            [-1, 1].product([-1, 1], [-1, 1]) do |dx, dy, dz|
-                temp = Set.new(s.map{|x, y, z| [x * dx, y * dy, z * dz]})
-                combs[[[dx, dy, dz], v]] = temp
-            end
+            combs[v] = Set.new(s)
         end
         scanner_variations[i] = combs
     end
@@ -47,26 +44,31 @@ def findOverlap(s1s, s2s, sn, overlaps)
 end
 
 def find_matches(id, oriented, all_orientations, locations, queue)
-    b = oriented[id].to_a[0]
-    pp "Testing id #{id}"
-    all_orientations.each do |i, vals|
-        next if id == i
-        next if locations.keys.include?(i)
-        pp "IDD: #{id} #{i}"
-        vals.each do |diff, set|
-            break if locations.keys.include?(i)
-            set.each do |beacon|
-                pp oriented[id]
-                return
-                dx = b[0] + beacon[0]
-                dy = b[1] + beacon[1]
-                dz = b[2] + beacon[2]
-                temp = Set.new(set.map{|x, y, z| [x - dx, y - dy, z - dz]})
-                if (oriented[id] & temp).length >= 12
-                    locations[i] = [locations[id][0] + dx, locations[id][1] + dy, locations[id][2] + dz]
-                    oriented[i] = set
-                    queue << i
-                    break
+    oriented[id].to_a.each do |b|
+        all_orientations.each do |i, vals|
+            next if id == i
+            next if locations.keys.include?(i)
+            vals.each do |rot, set|
+                break if locations.keys.include?(i)
+                set.each do |beacon|
+                    [-1, 1].product([-1, 1], [-1, 1]).each do |tx, ty, tz|
+                        dx = (tx * beacon[0]) - b[0]
+                        dy = (ty * beacon[1]) - b[1]
+                        dz = (tz * beacon[2]) - b[2]
+                        temp = Set.new(set.map{|x, y, z| [(tx * x) - dx, (ty * y) - dy, (tz * z) - dz]})
+                        if (oriented[id] & temp).length >= 1
+                            locations[i] = [-dx, -dy, -dz]
+                            oriented[i] = temp
+                            temp.each do |x, y, z|
+                                oriented[id] <<= [x + dx, y + dy, z + dz]
+                                # all_beacons[[x - dx, y - dy, z - dz]] = true
+                                # combines << [x - dx, y - dy, z - dz]
+                            end
+                            queue << i
+                            all_orientations.delete(i)
+                            return
+                        end
+                    end
                 end
             end
         end
@@ -90,17 +92,17 @@ def day19_1
     all_orientations = get_orientations(scanners)
     locations[0] = [0, 0, 0]
     oriented = {}
-    oriented[0] = all_orientations[0][[[1, 1, 1], 0]]
+    oriented[0] = all_orientations[0][0]
     queue = []
     queue << 0
     while queue.any?
         curr = queue.shift
-        pp curr
-        find_matches(curr, oriented, all_orientations, locations, queue)
+        find_matches(0, oriented, all_orientations, locations, queue)
     end
     locations
-    oriented[1]
+    # oriented[1]
 #   all_orientations[0]
+    # oriented[0].count
 end
 
 def day19_2
