@@ -5,16 +5,20 @@ input = File.read(file)
 
 $lines = input.split("\n\n")
 
-def get_orientations(scanner)
-    combs = []
-    [0,1,2].each do |v|
-        s = scanner.map{|r| r.rotate(v)}
-        [-1,1].product([-1, 1], [-1, 1]) do |dx, dy, dz|
-            temp = s.map{|x, y, z| [x * dx, y * dy, z * dz]}
-            combs << [temp, [dx, dy, dz]]
+def get_orientations(scanners)
+    scanner_variations = {}
+    scanners.each_with_index do |scanner, i|
+        combs = {}
+        [0,1,2].each do |v|
+            s = scanner.map{|r| r.rotate(v)}
+            [-1, 1].product([-1, 1], [-1, 1]) do |dx, dy, dz|
+                temp = Set.new(s.map{|x, y, z| [x * dx, y * dy, z * dz]})
+                combs[[[dx, dy, dz], v]] = temp
+            end
         end
+        scanner_variations[i] = combs
     end
-    combs
+    scanner_variations
 end
 
 def get_volumes(scanner)
@@ -42,6 +46,33 @@ def findOverlap(s1s, s2s, sn, overlaps)
     end
 end
 
+def find_matches(id, oriented, all_orientations, locations, queue)
+    b = oriented[id].to_a[0]
+    pp "Testing id #{id}"
+    all_orientations.each do |i, vals|
+        next if id == i
+        next if locations.keys.include?(i)
+        pp "IDD: #{id} #{i}"
+        vals.each do |diff, set|
+            break if locations.keys.include?(i)
+            set.each do |beacon|
+                pp oriented[id]
+                return
+                dx = b[0] + beacon[0]
+                dy = b[1] + beacon[1]
+                dz = b[2] + beacon[2]
+                temp = Set.new(set.map{|x, y, z| [x - dx, y - dy, z - dz]})
+                if (oriented[id] & temp).length >= 12
+                    locations[i] = [locations[id][0] + dx, locations[id][1] + dy, locations[id][2] + dz]
+                    oriented[i] = set
+                    queue << i
+                    break
+                end
+            end
+        end
+    end
+end
+
 def day19_1
     scanners = []
     locations = {}
@@ -56,26 +87,20 @@ def day19_1
         end
         scanners << scanner
     end
-    origin_scanner = scanners[0]
+    all_orientations = get_orientations(scanners)
     locations[0] = [0, 0, 0]
-    overlaps = Hash.new({})
-    scanners_sets = scanners.map{|s| Set.new(s)}
-    scanners.each_with_index do |scan, i|
-        findOverlap(scanners_sets, get_orientations(scan), i, overlaps)
-    end
-    queue = [0]
+    oriented = {}
+    oriented[0] = all_orientations[0][[[1, 1, 1], 0]]
+    queue = []
+    queue << 0
     while queue.any?
         curr = queue.shift
-        cc = locations[curr]
-        overlaps[curr].each do |k, (v, ds)|
-        if !locations.keys.include?(k)
-            queue << k
-            locations[k] = [(cc[0] + v[0]) * ds[0], (cc[1] + v[1]) * ds[1], (cc[2] + v[2]) * ds[2]]
-        end
+        pp curr
+        find_matches(curr, oriented, all_orientations, locations, queue)
     end
-  end
-  locations
-  overlaps
+    locations
+    oriented[1]
+#   all_orientations[0]
 end
 
 def day19_2
