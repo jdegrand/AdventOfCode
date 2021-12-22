@@ -39,52 +39,57 @@ class Cube
             x0_yz, x1_yz = 0, 0
             y0_z, y1_z = 0, 0
 
-            left = self.x0 < cube.x0 ? self : cube
-            right = self.x0 < cube.x0 ? cube : self
-            return [self] if left.x1 < right.x0
-            if left.x1 > right.x1 && left.x0 < right.x0
-                x0_x, x1_x, x0_yz, x1_yz = [left.x0, right.x0, right.x0, right.x1]
-                x0_x2, x1_x2 = [right.x1, left.x1]
-                new_cubes << [x0_x, x1_x, left.y0, left.y1, left.z0, left.z1]
-                new_cubes << [x0_x2, x1_x2, left.y0, left.y1, left.z0, left.z1]
-            elsif left.x1 <= right.x1 && left.x0 >= right.x0
-                x0_yz, x1_yz = [left.x0, left.x1]
+            # ctestCube.new(10, 11, 10, 13, 10, 13)
+            # c3 = Cube.new(9, 12, 9, 12, 9, 12)
+
+            if self.x1 > cube.x1 && self.x0 < cube.x0
+                x0_x, x1_x, x0_yz, x1_yz = [self.x0, cube.x0, cube.x0, cube.x1]
+                x0_x2, x1_x2 = [cube.x1, self.x1]
+                new_cubes << [x0_x, x1_x, self.y0, self.y1, self.z0, self.z1]
+                new_cubes << [x0_x2, x1_x2, self.y0, self.y1, self.z0, self.z1]
+            elsif self.x1 <= cube.x1 && self.x0 >= cube.x0
+                x0_yz, x1_yz = [self.x0, self.x1]
             else
-                x0_x, x1_x, x0_yz, x1_yz = left.x1 < right.x1 ? [left.x0, right.x0, right.x0, left.x1] : [right.x1, left.x1, left.x0, right.x1]
-                new_cubes << [x0_x, x1_x, left.y0, left.y1, left.z0, left.z1]
+                left = self.x0 <= cube.x0 ? self : cube
+                right = self.x0 <= cube.x0 ? cube : self
+                return [self] if left.x1 < right.x0
+                x0_x, x1_x, x0_yz, x1_yz = self.x1 < cube.x1 ? [self.x0, cube.x0, cube.x0, self.x1] : [cube.x1, self.x1, self.x0, cube.x1]
+                new_cubes << [x0_x, x1_x, self.y0, self.y1, self.z0, self.z1]
             end
 
-            left = self.y0 < cube.y0 ? self : cube
-            right = self.y0 < cube.y0 ? cube : self
-            return [self] if left.x1 < right.x0
-            if left.y1 > right.y1 && left.y0 < right.y0
-                y0_y, y1_y, y0_z, y1_z = [left.y0, right.y0, right.y0, right.y1]
-                y0_y2, y1_y2 = [right.y1, left.y1]
-                new_cubes << [x0_yz, x1_yz, y0_y, y1_y, left.z0, left.z1]
-                new_cubes << [x0_yz, x1_yz, y0_y2, y1_y2, left.z0, left.z1]
-            elsif left.y1 <= right.y1 && left.y0 >= right.y0
-                y0_z, y1_z = [left.y0, left.y1]
+            # 10, 13 right
+            #  9, 12 left 
+            if self.y1 > cube.y1 && self.y0 < cube.y0
+                y0_y, y1_y, y0_z, y1_z = [self.y0, cube.y0, cube.y0, cube.y1]
+                y0_y2, y1_y2 = [cube.y1, self.y1]
+                new_cubes << [x0_yz, x1_yz, y0_y, y1_y, self.z0, self.z1]
+                new_cubes << [x0_yz, x1_yz, y0_y2, y1_y2, self.z0, self.z1]
+            elsif self.y1 <= cube.y1 && self.y0 >= cube.y0
+                y0_z, y1_z = [self.y0, self.y1]
             else
-                y0_y, y1_y, y0_z, y1_z = left.y1 < right.y1 ? [left.y0, right.y0, right.y0, left.y1] : [right.y1, left.y1, left.y0, right.y1]
-                new_cubes << [x0_yz, x1_yz, y0_y, y1_y, left.z0, left.z1]
+                left = self.y0 <= cube.y0 ? self : cube
+                right = self.y0 <= cube.y0 ? cube : self
+                return [self] if left.y1 < right.y0
+                y0_y, y1_y, y0_z, y1_z = self.y0 <= cube.y0 ? [self.y0, cube.y0, cube.y0, self.y1] : [cube.y1, self.y1, self.y0, cube.y1]
+                new_cubes << [x0_yz, x1_yz, y0_y, y1_y, self.z0, self.z1]
             end
 
-            left = self.z0 < cube.z0 ? self : cube
-            right = self.z0 < cube.z0 ? cube : self
-            return [self] if left.x1 < right.x0
-            if left.z1 > right.z1 && left.z0 < right.z0
-                z0_z, z1_z = [left.z0, cube.z0]
-                z0_z2,z1_z2 = [cube.z1, left.z1]
+            if self.z1 > cube.z1 && self.z0 < cube.z0
+                z0_z, z1_z = [self.z0, cube.z0]
+                z0_z2,z1_z2 = [cube.z1, self.z1]
                 new_cubes << [x0_yz, x1_yz, y0_z, y1_z, z0_z, z1_z]
                 new_cubes << [x0_yz, x1_yz, y0_z, y1_z, z0_z2, z1_z2]
-            elsif left.z1 <= right.z1 && left.z0 >= right.z0
+            elsif self.z1 <= cube.z1 && self.z0 >= cube.z0
                 # Nothing depends on this, but we don't want to add any new cubes
             else
-                z0_z, z1_z = left.z1 < right.z1 ? [left.z0, right.z0] : [right.z1, left.z1]
+                left = self.z0 <= cube.z0 ? self : cube
+                right = self.z0 <= cube.z0 ? cube : self
+                return [self] if left.z1 < right.z0
+                z0_z, z1_z = self.z1 < cube.z1 ? [self.z0, cube.z0] : [cube.z1, self.z1]
                 new_cubes << [x0_yz, x1_yz, y0_z, y1_z, z0_z, z1_z]
             end
 
-            pp new_cubes.map{|x0, x1, y0, y1, z0, z1| Cube.new(x0, x1 - 1, y0, y1 - 1, z0, z1 - 1)}
+            # pp new_cubes.map{|x0, x1, y0, y1, z0, z1| Cube.new(x0, x1 - 1, y0, y1 - 1, z0, z1 - 1)}
             
             return new_cubes.map{|x0, x1, y0, y1, z0, z1| Cube.new(x0, x1 - 1, y0, y1 - 1, z0, z1 - 1)}
         end
@@ -113,37 +118,25 @@ def day22_2
     cuboids = Hash.new(false)
     reg = /(on|off) x=(?:(-?\d+)..(-?\d+)),y=(?:(-?\d+)..(-?\d+)),z=(?:(-?\d+)..(-?\d+))/
     ons = []
-    offs = []
     volume = 0
     $lines.reverse.each do |l|
         on, *coords = l.match(reg).captures
         x0, x1, y0, y1, z0, z1 = coords.map(&:to_i)
-        on = on == "on" ? true : false
-        cube = Cube.new(x0, x1, y0, y1, z0, z1)
-        # if on
-        #     subcubes = [cube]
-        #     offs.each do |c|
-        #         next_cubes = []
-        #         subcubes = subcubes.filter{ |s| !c.larger(s)}
-        #         subcubes.each do |s|
-        #             next_cubes += s.split(c)
-        #         end
-        #         subcubes = next_cubes
-        #     end
-        # else
 
-        # end
-        c1 = Cube.new(0, 4, 0, 4, 0, 4)
-        c2 = Cube.new(0, 3, 0, 3, 0, 3)
-        # pp c1
-        # pp c2
-        ons << cube if on
-        offs << cube unless on
-        # pp c1.volume
-        return c1.split(c2).map{|c| c.volume}.sum
-        # return c2.split(c1).map{|c| c.volume}.sum
+        on = on == "on" ? true : false
+
+        curr_cube = Cube.new(x0, x1, y0, y1, z0, z1)
+
+        new_ons = []
+        ons.each do |cube|
+            new_ons << cube.split(curr_cube)
+        end
+        new_ons.flatten!
+        new_ons << curr_cube if on
+        ons = new_ons
+        return ons
     end
-    cuboids.count{|_, v| v == true}
+    ons.map{|cube| cube.volume}.sum
 end
 
 # pp day22_1
