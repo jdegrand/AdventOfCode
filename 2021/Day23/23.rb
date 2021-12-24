@@ -30,7 +30,10 @@ class Piece
     attr_accessor :name, :row, :col, :cost
 end
 
-def in_location(chr, r, c, board)
+def in_location(piece, board)
+    chr = piece.name
+    r = piece.row
+    c = piece.col
     col = case chr
         when ?A then 3
         when ?B then 5
@@ -59,16 +62,15 @@ def get_moves(piece, board)
     end
 
     moves = []
-    pp board
     # If in hallway
     if piece.row == 1
         cols = valid_col < piece.col ? (valid_col...piece.col).to_a : (piece.col+1..valid_col).to_a
-        if cols.count{|c| board[[1, c] == ?.]} == cols.length
+        if cols.count{|c| board[[1, c]] == ?.} == cols.length
             if board[[2, valid_col]] == ?.
                 if board[[3, valid_col]] == ?.
-                    moves << [3, valid_col]
+                    moves << [[3, valid_col], (cols.count + 2) * piece.cost]
                 elsif board[[3, valid_col]] == piece.name
-                    moves << [2, valid_col]
+                    moves << [[2, valid_col], (cols.count + 1) * piece.cost]
                 end
             end
         end
@@ -77,10 +79,10 @@ def get_moves(piece, board)
         2.times do |t|
             dir = t == 0 ? -1 : 1
             curr = piece.col
+            steps = 1
             while board[[1, curr]] == ?.
-                if ![3, 5, 7, 9].include?(curr)
-                    moves << [1, curr] 
-                end
+                moves << [[1, curr], steps * piece.cost] if ![3, 5, 7, 9].include?(curr)
+                steps += 1
                 curr += dir
             end
         end
@@ -88,14 +90,87 @@ def get_moves(piece, board)
         2.times do |t|
             dir = t == 0 ? -1 : 1
             curr = piece.col
+            steps = 2
             while board[[1, curr]] == ?.
-                moves << [1, curr] if ![3, 5, 7, 9].include?(curr)
+                moves << [[1, curr], steps * piece.cost] if ![3, 5, 7, 9].include?(curr)
+                steps += 1
                 curr += dir
             end
         end
     end
 
     moves
+end
+
+def print_board(board)
+    5.times do |r|
+        s = ""
+        13.times do |c|
+            s += board[[r, c]]
+        end
+        puts s
+    end
+end
+
+def print_board2(board)
+    board.each{|r| puts r}
+    sleep(1)
+end
+
+def get_board(board)
+    rows = []
+    5.times do |r|
+        s = ""
+        13.times do |c|
+            s += board[[r, c]]
+        end
+        rows << s
+    end
+    rows
+end
+
+def dfs(pieces, board, results, sum, boards, seen, min_sum, depth)
+    min_sum[0] = sum if !pieces.any? && sum < min_sum[0]
+    return if sum > min_sum[0]
+    # pp pieces
+    # sleep(3)
+    # print_board(board)
+    # pp sum if sum < 13000 && !pieces.any?
+    # pp pieces.any?
+    results << [sum, boards] unless pieces.any?
+    # unless pieces.any?
+    #     boards.each do |b|
+    #         print_board2(b)
+    #         sleep(1)
+    #     end
+    # end
+    pieces.each_with_index do |piece, pi|
+        moves = get_moves(piece, board)
+        moves.each do |move, cost|
+            new_piece = piece.clone
+            new_board = board.clone
+            new_piece.row = move[0]
+            new_piece.col = move[1]
+            new_board[move] = piece.name
+            new_board[[piece.row, piece.col]] = ?.
+            new_pieces = pieces.clone
+            if in_location(new_piece, new_board)
+                new_pieces.delete_at(pi)
+            else
+                new_pieces[pi] = new_piece
+            end
+            if (!seen.key?(new_board)) || (seen.key?(new_board) && seen[new_board] > sum + cost)
+                seen[new_board] = sum + cost
+                # if sum + cost == 40 || depth == 1
+                #     print_board(new_board)
+                #     puts sum + cost
+                #     puts
+                #     puts
+                    dfs(new_pieces, new_board, results, sum + cost, boards + [get_board(new_board)], seen, min_sum, depth + 1)
+                # end
+            end
+        end
+    end
 end
 
 def day23_1
@@ -109,35 +184,15 @@ def day23_1
             pieces << [chr, [i, j]] if pieces_chars.include?(chr)
         end
     end
-    pieces.reject!{|chr, (x, y)| in_location(chr, x, y, board)}
-    pieces = pieces.map{|chr, (x, y)| Piece.new(chr, x, y)}
-    pp pieces
-    return get_moves(pieces[0], board)
-    # distances = Hash.new(Float::INFINITY)
-    # values = Hash.new(Float::INFINITY)
-
-    # distances[[0,0]] = 0
-    # visited = Set.new
-    
-    # unvisited = PQueue.new([Node.new([0, 0], 0)])
-
-    # end_c = [$lines.length * 5 - 1, $lines[0].length * 5 - 1]
-
-    # adj = [[0, -1], [0, 1], [-1, 0], [1, 0]]
-
-    # until distances[end_c] < Float::INFINITY
-    #     curr, val = unvisited.pop.fetch
-    #     adj.each do |dx, dy|
-    #         neigh = [curr[0] + dx, curr[1] + dy]
-    #         if (!visited.include?(neigh)) && (val + values[neigh] < distances[neigh])
-    #             distances[neigh] = val + values[neigh]
-    #             unvisited.push(Node.new(neigh, val + values[neigh]))
-    #         end
-    #     end
-    #     visited << curr
-    # end
-
-    # distances[end_c]
+    pieces = pieces.map{|chr, (x, y)| Piece.new(chr, x, y)}.reject{|piece| in_location(piece, board)}
+    # pp pieces
+    # return get_moves(pieces[5], board)
+    results = []
+    seen = {}
+    dfs(pieces, board, results, 0, [], seen, [Float::INFINITY], 0)
+    m = results.min_by{|s, _| s}
+    print_board2(m[1])
+    pp m[0]
 end
 
 def day23_2
