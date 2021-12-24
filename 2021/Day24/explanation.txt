@@ -1,0 +1,18 @@
+These equations need to be satisfied to cause a z = 0 at the end:
+
+(inp3 - 8) = inp4
+(inp7 + 5) = inp8
+(inp6 - 7) = inp9
+(inp10 - 6) = inp11
+(inp5 + 6) = inp12
+(inp2 - 1) = inp13
+(inp1 + 1) = inp14
+
+
+Using those rules, the following largest and smallest numbers can be formed:
+
+Largest:
+89913949293989
+
+Smallest:
+12911816171712

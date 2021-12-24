@@ -39,21 +39,13 @@ def execute(num)
 end
 
 def day24_1
-    curr = 1
-    while true
-        res = execute(curr)
-        pp curr if res
-        return curr if res
-        curr += 1
-    end
-end
-
-def part1
-    99
-    (inp3 - 8 == inp4) == 0 # inp3 - 6 must not be equal to inp4
+    largest = 89913949293989
+    largest if execute(largest)
 end
 
 def day24_2
+    smallest = 12911816171712
+    smallest if execute(smallest)
 end
 
 pp day24_1

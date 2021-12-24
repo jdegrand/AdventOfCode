@@ -1,41 +1,93 @@
-w = inp1
-x = 1
-y = inp1 + 1
-z = inp1 + 1
-
-# w = inp2
-# x = 1
-# y = inp2 + 10
-z = (inp1 + 1)*26 + inp2 + 10
-
-# w = inp3
-# x = 1
-# y = inp3 + 2
-# z = ((inp1 + 1)*26 + inp2 + 10)*26 + (inp3 + 2)
-
-inp w   # w = inp4
-div z 26 # z = (((inp1 + 1)*26 + inp2 + 10)*26 + (inp3 + 2))/26
-add x -10 # x = (inp3 + 2) - 10
-eql x w   # x = inp3 - 8 == inp4
-eql x 0   # x = (inp3 - 8 == inp4) == 0
-add y 25  # y = 25
-mul y x   # 25*((inp3 - 8 == inp4) == 0)
-add y 1   # y = 26
-
-          # x = 1
-mul z y   # z = (((inp1 + 1)*26 + inp2 + 10)*26 + (inp3 + 2))
-add y w   # y = inp4 + 5
-add z y   # z = (((inp1 + 1)*26 + inp2 + 10)*26 + (inp3 + 2)) + (inp4 + 5)
-
-inp w   # w = inp5
-mul x 0 # x = 0
--- add x z # x = (((((inp1 + 1)*26 + inp2 + 10)*26 + (inp3 + 2)) + (inp4 + 5)) % 26) + 11
-mul y 0 # y = 26
-mul z y # ((((inp1 + 1)*26 + inp2 + 10)*26 + (inp3 + 2)) + (inp4 + 5)) * 26
-add y w # y = inp5 + 6
-mul y x # x = 1
-add z y # (((((inp1 + 1)*26 + inp2 + 10)*26 + (inp3 + 2))*26 + (inp4 + 5)) * 26) + (inp5 + 6)
-
+inp w
+mul x 0
+add x z
+mod x 26
+div z 1
+add x 11
+eql x w
+eql x 0
+mul y 0
+add y 25
+mul y x
+add y 1
+mul z y
+mul y 0
+add y w
+add y 1
+mul y x
+add z y
+inp w
+mul x 0
+add x z
+mod x 26
+div z 1
+add x 10
+eql x w
+eql x 0
+mul y 0
+add y 25
+mul y x
+add y 1
+mul z y
+mul y 0
+add y w
+add y 10
+mul y x
+add z y
+inp w
+mul x 0
+add x z
+mod x 26
+div z 1
+add x 13
+eql x w
+eql x 0
+mul y 0
+add y 25
+mul y x
+add y 1
+mul z y
+mul y 0
+add y w
+add y 2
+mul y x
+add z y
+inp w
+mul x 0
+add x z
+mod x 26
+div z 26
+add x -10
+eql x w
+eql x 0
+mul y 0
+add y 25
+mul y x
+add y 1
+mul z y
+mul y 0
+add y w
+add y 5
+mul y x
+add z y
+inp w
+mul x 0
+add x z
+mod x 26
+div z 1
+add x 11
+eql x w
+eql x 0
+mul y 0
+add y 25
+mul y x
+add y 1
+mul z y
+mul y 0
+add y w
+add y 6
+mul y x
+add z y
 inp w
 mul x 0
 add x z
