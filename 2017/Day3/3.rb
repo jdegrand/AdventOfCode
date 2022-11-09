@@ -63,9 +63,49 @@ end
 # 351   11   23   25   26
 # 362  747  806  854  905  931 ...
 def day3_2
-
+    grid = Hash.new(0)
+    grid[[0, 0]] = 1
+    width = 3
+    x, y = 0, 1
+    side = ?R
+    halfway = width / 2
+    neighbors = [-1, 0, 1].product([-1, 0, 1]) - [[0, 0]]
+    number = 1
+    while number <= $lines
+        number = neighbors.map{|dx, dy| grid[[x + dx, y + dy]]}.inject(:+)
+        grid[[x, y]] = number
+        if side == ?R
+            if x == halfway
+                side = ?T
+                y -= 1
+            else
+                x += 1
+            end
+        elsif side == ?T
+            if y == -halfway
+                side = ?L
+                x -= 1
+            else
+                y -= 1
+            end
+        elsif side == ?L
+            if x == -halfway
+                side = ?B
+                y += 1
+            else
+                x -= 1
+            end
+        elsif side == ?B
+            if y == halfway
+                side = ?R
+                width += 2
+                halfway = width / 2
+            end
+            y += 1
+        end
+    end
+    number
 end
 
 pp day3_1
 pp day3_2
-
