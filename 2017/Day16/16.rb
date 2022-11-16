@@ -37,15 +37,15 @@ def day16_1
 end
 
 def day16_2
-    starting_programs = ('a'..'p').to_a
     programs = ('a'..'p').to_a
     dance_moves = $lines[0].split(?,)
     upper_limit = 1000000000
+    starting_programs = programs.clone
     loop_at = upper_limit.times do |t|
+        break t if starting_programs == programs && t != 0
         dance(programs, dance_moves)
-        break t if starting_programs == programs
     end
-    ((upper_limit % loop_at) - 1).times{dance(programs, dance_moves)}
+    (upper_limit % loop_at).times{dance(programs, dance_moves)}
     programs.join
 end
 
