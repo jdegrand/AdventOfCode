@@ -18,18 +18,7 @@ class LinkedList
         @head = node
         node.next = old_head.next
         old_head.next = node
-        if old_head.value == 0
-            puts value
-        end
     end
-
-    # def find_after(value)
-    #     curr = @head
-    #     until curr.value == value
-    #         curr = curr.next
-    #     end
-    #     curr.next.value
-    # end
 
     def print
         curr = @head.next
@@ -67,12 +56,13 @@ end
 
 def day17_2
     step_size = $lines[0].to_i
-    spinlock = LinkedList.new(0, step_size)
-    (1..3).each do |v|
-        spinlock.insert(v)
+    current_index = 0
+    after_zero = 0
+    (1..50000000).each do |v|
+        current_index = ((current_index + step_size) % v) + 1
+        after_zero = v if current_index == 1
     end
-    spinlock.head.next.value
-    spinlock.print
+    after_zero
 end
 
 pp day17_1
