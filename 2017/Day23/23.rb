@@ -1,3 +1,5 @@
+require 'prime'
+
 file = 'input.txt'
 input = File.read(file)
 
@@ -32,45 +34,33 @@ def day23_1
     mul_count
 end
 
-
-def day23_2
-    a, b, c, d, e, f, g, h = 1, 0, 0, 0, 0, 0, 0, 0
-    b = 105700
+def day23_2_inefficient
+    a, _b, c, _d, _e, f, g, h = 1, 0, 0, 0, 0, 0, 0, 0
+    original_b = 105700
     c = 122700
-    loop do
+    (original_b..c).step(17) do |b|
         f = 1
-        d = 2
-        loop do
-            e = 2
-            broken = loop do
+        (2...b).each do |d|
+            (2...b).each do |e|
                 g = (d * e) - b
                 if g == 0
                     f = 0
-                    break :broke
                 end
-                e += 1
-                g = e - b
-                if g == 0
-                    break
-                end
-            end
-            break if broken == :broke
-            d += 1
-            g = d - b
-            if g == 0
-                break
             end
         end
         if f == 0
             h += 1
         end
-        g = b - c
-        if g == 0
-            break
-        end
-        b += 17
     end
+    h
 end
+
+def day23_2
+    b = 105700
+    c = 122700
+    (b..c).step(17).count{|n| !n.prime?}
+end
+
 
 pp day23_1
 pp day23_2
