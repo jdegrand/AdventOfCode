@@ -21,15 +21,20 @@ def day9_1
                 head = [head[0], head[1] - 1]
             end
             if [-1, 0, 1].product([-1, 0, 1]).map{|dx, dy| [tail[0] + dx, tail[1] + dy]}.none?{|coord| coord == head}
-                case dir
-                when ?R
-                    tail = [head[0] - 1, head[1]]
-                when ?L
-                    tail = [head[0] + 1, head[1]]
-                when ?U
-                    tail = [head[0], head[1] - 1]
-                when ?D
-                    tail = [head[0], head[1] + 1]
+                if [[-2, 0], [2, 0], [0, -2], [0, 2]].map{|dx, dy| [tail[0] + dx, tail[1] + dy]}.any?{|coord| coord == head}
+                    case dir
+                    when ?R
+                        tail = [head[0] - 1, head[1]]
+                    when ?L
+                        tail = [head[0] + 1, head[1]]
+                    when ?U
+                        tail = [head[0], head[1] - 1]
+                    when ?D
+                        tail = [head[0], head[1] + 1]
+                    end
+                else
+                    delta = [head[0] > tail[0] ? 1 : -1, head[1] > tail[1] ? 1 : -1]
+                    tail = [tail[0] + delta[0], tail[1] + delta[1]]
                 end
             end
             visited[tail] += 1
@@ -55,29 +60,24 @@ def day9_2
             when ?D
                 knot_pos[0] = [knot_pos[0][0], knot_pos[0][1] - 1]
             end
-            pp "#{num}: #{t+1}"
-            # num.times do
-                ((t + 1)..9).each do |sn|
-                    if [-1, 0, 1].product([-1, 0, 1]).map{|dx, dy| [knot_pos[sn][0] + dx, knot_pos[sn][1] + dy]}.none?{|coord| coord == knot_pos[sn - 1]}
-                        case dir
-                        when ?R
-                            knot_pos[sn] = [knot_pos[sn - 1][0] - 1, knot_pos[sn - 1][1]]
-                        when ?L
-                            knot_pos[sn] = [knot_pos[sn - 1][0] + 1, knot_pos[sn - 1][1]]
-                        when ?U
-                            knot_pos[sn] = [knot_pos[sn - 1][0], knot_pos[sn - 1][1] - 1]
-                        when ?D
-                            knot_pos[sn] = [knot_pos[sn - 1][0], knot_pos[sn - 1][1] + 1]
-                        end
+            (1..9).each do |n|
+                if [-1, 0, 1].product([-1, 0, 1]).map{|dx, dy| [knot_pos[n][0] + dx, knot_pos[n][1] + dy]}.none?{|coord| coord == knot_pos[n - 1]}
+                    if [knot_pos[n][0] + -2, knot_pos[n][1] + 0] == knot_pos[n - 1]
+                        knot_pos[n] = [knot_pos[n][0] - 1, knot_pos[n][1]]
+                    elsif [knot_pos[n][0] + 2, knot_pos[n][1] + 0] == knot_pos[n - 1]
+                        knot_pos[n] = [knot_pos[n][0] + 1, knot_pos[n][1]]
+                    elsif [knot_pos[n][0] + 0, knot_pos[n][1] + -2] == knot_pos[n - 1]
+                        knot_pos[n] = [knot_pos[n][0], knot_pos[n][1] - 1]
+                    elsif [knot_pos[n][0] + 0, knot_pos[n][1] + 2] == knot_pos[n - 1]
+                        knot_pos[n] = [knot_pos[n][0], knot_pos[n][1] + 1]
+                    else
+                        delta = [knot_pos[n - 1][0] > knot_pos[n][0] ? 1 : -1, knot_pos[n - 1][1] > knot_pos[n][1] ? 1 : -1]
+                        knot_pos[n] = [knot_pos[n][0] + delta[0], knot_pos[n][1] + delta[1]]
                     end
-                    pp "#{sn}: #{knot_pos[sn]}"
-
-                    visited[knot_pos[sn]] += 1 if sn == 9
                 end
-            # end
-            puts
+                visited[knot_pos[n]] += 1 if n == 9
+            end
         end
-        return if dir == "U"
     end
     visited.length
 end
