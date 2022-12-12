@@ -5,15 +5,15 @@ input = File.read(file)
 
 $lines = input.lines.map(&:chomp)
 
-def backtack(curr, steps, visited, grid, ways, dp)
+def backtack(curr, steps, visited, grid, ways, mins)
     ways << steps if grid[curr] == ?|
-    dp[curr] = steps
+    mins[curr] = steps
 
     [[1, 0], [-1, 0], [0, 1], [0, -1]].each do |dx, dy|
         coord = [curr[0] + dx, curr[1] + dy]
-        if !visited.include?(coord) && dp[coord] > steps + 1 && ((grid[coord].ord <= (grid[curr].ord + 1)) ||  (grid[curr] == ?z && grid[coord] == ?|))
+        if !visited.include?(coord) && mins[coord] > steps + 1 && ((grid[coord].ord <= (grid[curr].ord + 1)) ||  (grid[curr] == ?z && grid[coord] == ?|))
             visited << coord
-            backtack(coord, steps + 1, visited, grid, ways, dp)
+            backtack(coord, steps + 1, visited, grid, ways, mins)
             visited.delete(coord)
         end
     end
@@ -35,10 +35,10 @@ def day12_1
     grid[goal] = ?|
 
     visited = Set.new
-    dp = Hash.new(Float::INFINITY)
+    mins = Hash.new(Float::INFINITY)
     ways = []
 
-    backtack(start, 0, visited, grid, ways, dp)
+    backtack(start, 0, visited, grid, ways, mins)
     
     ways.min
 end
@@ -63,9 +63,9 @@ def day12_2
     grid[goal] = ?|
 
     visited = Set.new
-    dp = Hash.new(Float::INFINITY)
+    mins = Hash.new(Float::INFINITY)
     ways = []
-    starts.each{|start| backtack(start, 0, visited, grid, ways, dp)}
+    starts.each{|start| backtack(start, 0, visited, grid, ways, mins)}
     
     ways.min
 end
