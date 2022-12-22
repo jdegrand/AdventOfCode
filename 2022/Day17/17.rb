@@ -11,25 +11,24 @@ $rocks = [
 ]
 def day17_1
     chamber = Hash.new(?.)
-    (0...7).each{|n| chamber[[0, n]] = ?#}
-    highest = 1
-
+    (0...7).each{|n| chamber[[-1, n]] = ?#}
+    highest = -1
+    rocks = $rocks.map(&:reverse)
     jets_index = 0
-    2022.times do |t|
-        rock = $rocks[t % 5]
+    15.times do |t|
+        rock = rocks[t % 5]
         rock_start = 2
         rock_end = 2 + rock[0].length - 1
-        rock_vert = highest + 3
+        bottom_rock = highest + 4
         while true
             case $jets[jets_index]
             when ?<
-                rock.reverse.each_with_index.map{|r, i|}
-                if rock_start > 0 && rock.reverse.each_with_index.all?{|r, i| r.chars.each_with_index.none?{|c, ci| chamber[[rock_vert + i, rock_start - 1 + ci]] == ?# && c == ?#}}
+                if rock_start - 1 >= 0 && rock.each_with_index.map{|row, ri| row.chars.each_with_index.none?{|chr, ci| chamber[[bottom_rock + ri, rock_start - 1 + ci]] == ?# and chr == ?#}}.all?
                     rock_start -= 1
                     rock_end -= 1
                 end
             when ?>
-                if rock_end + 1 < 7 && rock.reverse.each_with_index.all?{|r, i| r.chars.each_with_index.none?{|c, ci| chamber[[rock_vert + i, rock_start + 1 + ci]] == ?# && c == ?#}}
+                if rock_end + 1 < 7 && rock.each_with_index.map{|row, ri| row.chars.each_with_index.none?{|chr, ci| chamber[[bottom_rock + ri, rock_start + 1 + ci]] == ?# and chr == ?#}}.all?
                     rock_start += 1
                     rock_end += 1
                 end
@@ -37,15 +36,15 @@ def day17_1
                 raise "Invalid jet input!"
             end
             jets_index = (jets_index + 1) % $jets.length
-            next_vert = rock_vert - 1
-            break if (rock_start..rock_end).map{|n| chamber[[next_vert, n]]}.each_with_index.any?{|r, i| rock[-1][i] == ?# && r == ?#}
-            rock_vert -= 1
+            break if rock[0].chars.each_with_index.any?{|chr, ci| chamber[[bottom_rock - 1, rock_start + ci]] == ?# && chr == ?#}
+            bottom_rock -= 1
         end
-        rock.each_with_index{|layer, li| layer.chars.each_with_index{|c, ci| chamber[[rock_vert + (rock.length - 1 - li), rock_start + ci]] = c if c == ?#}}
-        highest = rock_vert + rock.length
+        rock.each_with_index{|row, ri| row.chars.each_with_index{|chr, ci| chamber[[bottom_rock + ri, rock_start + ci]] = chr if chr == ?#}}
+        # print(chamber)
+        highest = [bottom_rock + rock.length - 1, highest].max
+        pp highest + 1
     end
-    print(chamber)
-    highest - 1
+    # highest + 1
 end
 
 def print(chamber)
