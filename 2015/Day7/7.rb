@@ -16,44 +16,21 @@ def get_val(key, wires)
     key =~ /\d+/ ? key.to_i : wires[key]
 end
 
-
-# def day7_1
-#     wires = Hash.new(0)
-#     $lines.each do |l|
-#         if l =~ $ops[:set]
-#             val, wire = l.match($ops[:set]).captures
-#             wires[wire] = get_val(val, wires)
-#         elsif l =~ $ops[:and]
-#             val1, val2, wire = l.match($ops[:and]).captures
-#             wires[wire] = get_val(val1, wires) & get_val(val2, wires)
-#         elsif l =~ $ops[:or]
-#             val1, val2, wire = l.match($ops[:or]).captures
-#             wires[wire] = get_val(val1, wires) | get_val(val2, wires)
-#         elsif l =~ $ops[:lshift]
-#             val1, val2, wire = l.match($ops[:lshift]).captures
-#             wires[wire] = get_val(val1, wires) << val2.to_i
-#         elsif l =~ $ops[:rshift]
-#             val1, val2, wire = l.match($ops[:rshift]).captures
-#             wires[wire] = get_val(val1, wires) >> val2.to_i
-#         elsif l =~ $ops[:not]
-#             val, wire = l.match($ops[:not]).captures
-#             val = get_val(val, wires)
-#             puts "her", val
-#             val = "0b#{val.to_s(2).rjust(16, "0").chars.map{|c| c == ?0 ? ?1 : ?0}.join}".to_i(2)
-#             wires[wire] = val
-#         end
-#     end
-#     wires
-# end
+def is_num?(key)
+    key =~ /\d+/
+end 
 
 def day7_1
-    wires = Hash.new(0)
+    wires = {}
+    relies_on = Hash.new([])
     $lines.each do |l|
         if l =~ $ops[:set]
             val, wire = l.match($ops[:set]).captures
             wires[wire] = val
         elsif l =~ $ops[:and]
             val1, val2, wire = l.match($ops[:and]).captures
+            relies_on << val1 if !is_num?(val1)
+            relies_on << val2 if !is_num?(val2)
             wires[wire] = get_val(val1, wires) & get_val(val2, wires)
         elsif l =~ $ops[:or]
             val1, val2, wire = l.match($ops[:or]).captures
@@ -66,10 +43,8 @@ def day7_1
             wires[wire] = get_val(val1, wires) >> val2.to_i
         elsif l =~ $ops[:not]
             val, wire = l.match($ops[:not]).captures
-            val = get_val(val, wires)
-            puts "her", val
-            val = "0b#{val.to_s(2).rjust(16, "0").chars.map{|c| c == ?0 ? ?1 : ?0}.join}".to_i(2)
-            wires[wire] = val
+            val = get_val(val)
+            wires[wire] = ~val if val
         end
     end
     wires
