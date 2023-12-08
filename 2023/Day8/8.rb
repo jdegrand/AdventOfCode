@@ -29,7 +29,6 @@ def day8_2
         nodes[node] = [left, right]
     }
     curr = nodes.keys.filter{|n| n[-1] == ?A}
-    first_z = {}
     curr.map{ |c|
         steps = dir_ind = 0
         until c[-1] == ?Z
