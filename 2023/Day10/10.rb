@@ -102,8 +102,54 @@ def day10_2(visited)
     }.sum
 end
 
+# Solution implementing Shoelace Formula and Pick's Theorem after looking at other's on Reddit
+def day10_3(visited)
+    maze = Hash.new(?.)
+    $lines.each_with_index{ |l, r|
+        l.chars.each_with_index { |ch, c|
+            maze[[r, c]] = ch
+        }
+    }
+    neighbors_away = {
+        ?| => [[-1, 0], [1, 0]], 
+        ?- => [[0, 1], [0, -1]],
+        ?L => [[-1, 0], [0, 1]],
+        ?J => [[-1, 0], [0, -1]],
+        ?7 => [[1, 0], [0, -1]],
+        ?F => [[1, 0], [0, 1]],
+        ?. => [[0, 0]]
+    }
+    neighbors_to = {}
+    neighbors_away.each{|k, v| neighbors_to[k] = v.map{|dr, dc| [-dr, -dc]}}
+    s_to_pipe = {
+        Set.new([[0, -1], [-1, 0]]) => ?J,
+        Set.new([[0, -1], [0, 1]]) => ?-,
+        Set.new([[0, -1], [1, 0]]) => ?7,
+        Set.new([[0, 1], [-1, 0]]) => ?L,
+        Set.new([[0, 1], [1, 0]]) => ?F,
+        Set.new([[-1, 0], [1, 0]]) => ?|,
+    }
+
+    s = maze.find{ _2 == ?S}.first
+    start_diffs = [[-1, 0], [1, 0], [0, -1], [0, 1]].map{|dr, dc| [[s.first + dr, s.last + dc], [dr, dc]]}.filter{ neighbors_to[maze[_1]].include?(_2)}.map(&:last)
+
+    # Replace S with character it should be
+    s_replacement = s_to_pipe[Set.new(start_diffs)]
+    maze[s] = s_replacement
+    all_coords = visited.to_a.filter{|coord| [?L, ?F, ?J, ?7].include?(maze[coord])}
+    xs = all_coords.map(&:first)
+    ys = all_coords.map(&:last)
+
+    # Shoelace Formula
+    area = (xs.zip(ys.rotate).map{|x, y| x * y}.sum - ys.zip(xs.rotate).map{|x, y| x * y}.sum).abs / 2.0
+    
+    # Pick's Theorem
+    area + 1 - (visited.length / 2.0) 
+end
+
 $part1, visited = day10_1
 $part2 = day10_2(visited)
+$part3 = day10_3(visited)
 
 pp $part1
 pp $part2
