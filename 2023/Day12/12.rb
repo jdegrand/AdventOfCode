@@ -18,9 +18,7 @@ def day12_1
 end
 
 def day12_2()
-    count = 0
     $lines.map{ |l|
-        count += 1
         (1..2).map do |n|
             row, records = l.split
             row = ([row] * n).join("?")
