@@ -17,13 +17,13 @@ def backtracking(curr, current_score, dir, dir_count, visited, minimum, goal, bo
     end
     paths = [[0, -1], [0, 1], [-1, 0], [1, 0]].reject do |dr, dc| 
         nr, nc = curr.first + dr, curr.last + dc
-        visited.include?([[nr, nc]]) || nr < 0 || nc < 0 || nr >= board.length || nc >= board[0].length
+        visited[[nr, nc]] < dir_count || nr < 0 || nc < 0 || nr >= board.length || nc >= board[0].length
     end
     paths.each do |dr, dc|
         next_pos = [curr.first + dr, curr.last + dc]
-        visited << [next_pos]
+        visited[next_pos] if visited
         backtracking(next_pos, current_score + board[curr.first][curr.last].to_i, [dr, dc], [dr, dc] == dir ? dir_count + 1 : 0, visited, minimum, goal, board)
-        visited.delete([next_pos])
+        visited[next_pos] -= 1
     end
 end
 
