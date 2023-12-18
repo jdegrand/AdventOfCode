@@ -15,6 +15,8 @@ def print_board(board)
     }
 end
 
+# 5782
+
 def day16_1
     board = {}
     $lines.each_with_index { |l, r|
