@@ -6,48 +6,78 @@ input = File.read(file)
 $lines = input.lines.map(&:chomp)
 
 def day18_1
-  ground = Hash.new(?.)
-  vertices = []
+    ground = Hash.new(?.)
+    vertices = Set.new
 
-  dirs = {
-    ?L => [0, -1],
-    ?R => [0, 1],
-    ?U => [-1, 0],
-    ?D => [1, 0],
-  }.freeze
+    dirs = {
+        ?L => [0, -1],
+        ?R => [0, 1],
+        ?U => [-1, 0],
+        ?D => [1, 0],
+    }.freeze
 
-  r, c = 0, 0
-  vertices << [r, c]
-  ground[[r, c]] = ?#
-
-  $lines.each do |l|
-    dir, n, _ = l.split
-    n = n.to_i
-    dr, dc = dirs[dir]
-
-    n.times do
-      r += dr
-      c += dc
-      ground[[r, c]] = ?#
-    end
+    r, c = 0, 0
     vertices << [r, c]
-  end
+    ground[[r, c]] = ?#
 
-  # Print for debugging
-  puts "Vertices: #{vertices}"
+    $lines.each{ |l|
+        dir, n, _ = l.split
+        n = n.to_i
+        dr, dc = dirs[dir]
 
-  xs = vertices.map(&:first)
-  ys = vertices.map(&:last)
+        n.times {
+            r += dr
+            c += dc
+            ground[[r, c]] = ?#
+        }
+        vertices << [r, c]
+    }
 
-  # Shoelace Formula
-  area = 0.5 * (0...vertices.length).reduce(0) do |sum, i|
-    sum + (xs[i] * ys[(i + 1) % vertices.length] - xs[(i + 1) % vertices.length] * ys[i])
-  end.abs
+    xs = vertices.map(&:first)
+    ys = vertices.map(&:last)
 
-  area
+    # Shoelace Formula
+    area = (xs.zip(ys.rotate).map{|x, y| x * y}.sum - ys.zip(xs.rotate).map{|x, y| x * y}.sum).abs / 2.0
+
+    # Pick's Theorem
+    area + (ground.count{ _2 == ?# } / 2.0) + 1
 end
 
 def day18_2
+    vertices = Set.new
+
+    dirs = {
+        ?0 => [0, 1],  # R
+        ?1 => [1, 0],  # D
+        ?2 => [0, -1], # L
+        ?3 => [-1, 0], # U
+    }.freeze
+
+    r, c = 0, 0
+    border_count = 0
+    vertices << [r, c]
+
+    $lines.each{ |l|
+        _, _, hex = l.split
+        dir = hex[-2]
+        n = hex[2...-2].to_i(16)
+        dr, dc = dirs[dir]
+
+        border_count += n
+        r += (n * dr)
+        c += (n * dc)
+ 
+        vertices << [r, c]
+    }
+
+    xs = vertices.map(&:first)
+    ys = vertices.map(&:last)
+
+    # Shoelace Formula
+    area = (xs.zip(ys.rotate).map{|x, y| x * y}.sum - ys.zip(xs.rotate).map{|x, y| x * y}.sum).abs / 2.0
+
+    # Pick's Theorem
+    area + (border_count / 2.0) + 1
 end
 
 pp day18_1
