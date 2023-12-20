@@ -48,22 +48,47 @@ def day19_1
     }.filter_map{ _1 if _2 == ?A }.map{ _1.values.sum }.sum    
 end
 
-def recursion(workflow, workflows)
+def get_accepted(workflow, workflows, values, accepted)
     if workflow == ?A
-        return 'true'
+        accepted << values.values.map(&:size).inject(:*)
+        return
     elsif workflow == ?R
-        return 'false'
+        return 
     end
     rules = workflows[workflow]
+    new_values = values.clone
     resolved_rules = rules.map{ |rule|
+        local_values = new_values.clone
         var, sign, num, next_workflow = rule.match(/([a-z]+)(>|<)(\d+):([a-zAR]+)/)&.captures || [nil, nil, nil, rule]
         if var && sign && num && next_workflow
-            "(" + "#{var}#{sign}#{num}&&" + recursion(next_workflow, workflows) + ")"
+            num = num.to_i
+            current_range = values[var]
+            if !current_range.cover?(num)
+                # Shouldn't be possible
+                local_values[var] = (0...0)
+            else
+                if sign == ?>
+                    local_values[var] = (([num + 1, current_range.min].max)..current_range.max)
+                else
+                    local_values[var] = (current_range.min..([num - 1, current_range.max].min))
+                end
+            end
+            inverted_range = values[var]
+            if !inverted_range.cover?(num)
+                # Shouldn't be possible
+                new_values[var] = (0...0)
+            else
+                if sign == ?>
+                    new_values[var] = (inverted_range.min..([num, inverted_range.max].min))
+                else
+                    new_values[var] = (([num, inverted_range.min].max)..inverted_range.max)
+                end
+            end
+            get_accepted(next_workflow, workflows, local_values, accepted)
         else
-            "(" + recursion(next_workflow, workflows) + ")"
+            get_accepted(next_workflow, workflows, new_values, accepted)
         end
     }
-    return "#{resolved_rules.join("||")}"
 end
 
 def intersect_range(ranges, new_range)
@@ -92,40 +117,6 @@ def intersect_range(ranges, new_range)
     end
 end
 
-# (x<1416&&true)
-def parser(str, index, depth, values)
-    local_string = ''
-    while true
-        curr = str[index]
-        if curr == "("
-            return parser(str, index + 1, depth + 1, values.clone)
-            break
-        elsif curr == ")"
-            return true if local_string == "true"
-            return false if local_string == "false"
-            var = local_string[0]
-            sign = local_string[1]
-            num = local_string[2..].to_i
-
-            new_range = sign == ?< ? (1...num) : ((num + 1)..4000)
-
-            temp = values.clone
-            temp[var] = intersect_range(temp[var], new_range)
-            return temp
-            break
-        elsif curr == "&"
-            return parser(str, index + 2, depth, values)
-            break
-        elsif curr == "|"
-            return parser(str, index + 2, depth, values)
-            break
-        else
-            local_string += curr
-            index += 1
-        end
-    end
-end
-
 def day19_2
     workflows_array = $lines[0].lines.map(&:chomp)
     workflows = {}
@@ -136,22 +127,21 @@ def day19_2
         workflows[name] = rules.split(?,)
     } 
 
-    str = recursion("in", workflows)
-    #  Change to 
-
     values = {
-        ?x => [(1..4000)],
-        ?m => [(1..4000)],
-        ?a => [(1..4000)],
-        ?s => [(1..4000)]
+        ?x => (1..4000),
+        ?m => (1..4000),
+        ?a => (1..4000),
+        ?s => (1..4000)
     }
+    accepted = []
 
-    "(s<1351&&(a<2006&&(x<1416&&true)||((x>2662&&true)||(false)))||(m>2090&&true)||((s<537&&(a>3333&&false)||(false))||(x>2440&&false)||(true)))||((s>2770&&(s>3448&&true)||((m>1548&&true)||(true)))||(m<1801&&(m>838&&true)||((a>1716&&false)||(true)))||(false))"
+    get_accepted("in", workflows, values, accepted)
+    accepted.sum
+    # Mine
+    # 236866944613058
 
-    # str.gsub!("||(false)", '')
-    str = "(x<1416&&true)"
-    # intersect_range([4..6, 10..14, 18..21], 2..40)
-    parser(str, 0, 0, values)
+    # Correct
+    # 127675188176682
 end
 
 pp day19_1
