@@ -30,20 +30,28 @@ def day22_1
 
     bricks.sort_by{ |brick, _| brick.last.begin }
 
-    until bricks.empty?
-        brick, label = bricks.shift
-        while true
-            z = brick.last.begin
-            break if z == 1
-            old_z_range = brick.last
-            new_z_range = ((old_z_range.begin - 1)..(old_z_range.last - 1))
-            new_brick = brick.clone
-            new_brick[2] = new_z_range
-            break if zs[z - 1].any?{|subbrick, _| new_brick.zip(subbrick).map{ range_overlap.call(_1, _2)}.all? }
-            old_z_range.each{ zs[_1].delete([brick, label]) }
-            new_z_range.each{ zs[_1] += [[new_brick, label]] }
-            brick = new_brick
+    while true
+        next_iter = []
+        bricks_moved = false
+        until bricks.empty?
+            brick, label = bricks.shift
+            while true
+                z = brick.last.begin
+                break if z == 1
+                old_z_range = brick.last
+                new_z_range = ((old_z_range.begin - 1)..(old_z_range.last - 1))
+                new_brick = brick.clone
+                new_brick[2] = new_z_range
+                break if zs[z - 1].any?{|subbrick, _| new_brick.zip(subbrick).map{ range_overlap.call(_1, _2)}.all? }
+                old_z_range.each{ zs[_1].delete([brick, label]) }
+                new_z_range.each{ zs[_1] += [[new_brick, label]] }
+                brick = new_brick
+                bricks_moved = true
+            end
+            next_iter << [brick, label]  
         end
+        break if !bricks_moved
+        bricks = next_iter
     end
 
     zs.map{|z, bricks|
@@ -60,24 +68,8 @@ def day22_1
                     updated_supported.zip(subbrick).map{ range_overlap.call(_1, _2)}.all?
                 }
             }.any? || its_supporting.empty?
-            # pp "#{label}"
-            # pp "brick #{brick}"
-            # pp " all zs #{zs[z]}"
-            # pp "- curr #{(zs[z].reject{ _1 == [brick, label] })}"
-            # pp "its_supporting #{its_supporting}"
-            
-            # x = its_supporting.map{|supported, _|
-            #     (zs[z].reject{ _1 == [brick, label] }).any?{|subbrick, _| supported.zip(subbrick).map{ range_overlap.call(_1, _2)}.all? }
-            # }
-            # pp x
-            # puts
-            # return
-            # puts
         }.map(&:last)
     }.flatten.uniq.length
-
-    # bricks
-    # zs
 end
 
 def day22_2
