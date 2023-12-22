@@ -53,22 +53,61 @@ def recursion2(curr, steps_remaining, board, evens, visited, dp)
     dp[curr] = [dp[curr] || 0, steps_remaining].max
 end
 
+# def maximum_border(curr, steps_remaining, board, evens, visited, dp)
+#     # return if dp[curr] && dp[curr] >= steps_remaining
+#     ways = 0
+#     ways += 1 if steps_remaining.even?
+#     if steps_remaining == 0
+#         return ways
+#     end
+#     neighbors = [[-1, 0], [1, 0], [0, -1], [0, 1]].map{ |dr, dc| [curr.first + dr, curr.last + dc] }
+#     neighbors.filter!{ |r, c|
+#         !(board[r][c] == ?#) && !visited.include?([r, c]) && (dp[[r, c]] || 0) < steps_remaining && !(dp[curr] && dp[curr] >= steps_remaining)
+#     }
+#     neighbors.each{ |next_pos|
+#         visited << next_pos
+#         recursion2(next_pos, steps_remaining - 1, board, evens, visited, dp)
+#         visited.delete(next_pos)
+#     }
+#     dp[curr] = [dp[curr] || 0, steps_remaining].max
+# end
+
 def maximum_border(curr, steps_remaining, board, evens, visited, dp)
     return if dp[curr] && dp[curr] >= steps_remaining
+    evens << curr if steps_remaining.even?
+    # ways = 0
+    # ways += 1 if steps_remaining.even?
+    if steps_remaining == 0
+        return
+    end
+    neighbors = [[-1, 0], [1, 0], [0, -1], [0, 1]].map{ |dr, dc| [curr.first + dr, curr.last + dc] }
+    neighbors.filter!{ |r, c|
+        r >= 0 && r < board.length && c >= 0 && c < board[0].length && !(board[r][c] == ?#) && !visited.include?([r, c]) && (dp[[r, c]] || 0) < steps_remaining && !(dp[curr] && dp[curr] >= steps_remaining)
+    }
+    neighbors.each{ |next_pos|
+        visited << next_pos
+        maximum_border(next_pos, steps_remaining - 1, board, evens, visited, dp)
+        visited.delete(next_pos)
+    }
+    dp[curr] = [dp[curr] || 0, steps_remaining].max
+end
+
+def try2(curr, steps_remaining, board, evens, visited, dp)
+    # return if dp[curr] && dp[curr] >= steps_remaining
+    dp[curr] = steps_remaining
+
     evens << curr if steps_remaining.even?
     if steps_remaining == 0
         return
     end
     neighbors = [[-1, 0], [1, 0], [0, -1], [0, 1]].map{ |dr, dc| [curr.first + dr, curr.last + dc] }
     neighbors.filter!{ |r, c|
-        !(board[r][c] == ?#) && !visited.include?([r, c]) && (dp[[r, c]] || 0) < steps_remaining 
+        # r >= 0 && r < board.length && c >= 0 && c < board[0].length && !(board[r][c] == ?#) && (dp[[r, c]] || 0) < steps_remaining && !(dp[curr] && dp[curr] >= steps_remaining)
+        !(board[r % board.length][c % board[0].length] == ?#) && (dp[[r, c]] || 0) < steps_remaining && !(dp[[r, c]] && dp[[r, c]] >= steps_remaining - 1)
     }
     neighbors.each{ |next_pos|
-        visited << next_pos
-        recursion2(next_pos, steps_remaining - 1, board, evens, visited, dp)
-        visited.delete(next_pos)
+        try2(next_pos, steps_remaining - 1, board, evens, visited, dp)
     }
-    dp[curr] = [dp[curr] || 0, steps_remaining].max
 end
 
 def day21_2
@@ -79,8 +118,9 @@ def day21_2
     evens = Set.new
     visited = Set.new
     dp = {}
-    maximum_border(start, 500, board, evens, visited, dp)
+    try2(start, 100, board, evens, visited, dp)
     evens.size
+    # dp
 end
 
 # pp day21_1
