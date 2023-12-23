@@ -71,39 +71,6 @@ def day22_1
     safe_bricks.size
 end
 
-def get_supported(brick, zs, cache)
-    # return cache[brick] if cache.key?(brick)
-    # Highest z point
-    z = brick.last.end
-
-    new_z_range = ((brick.last.begin + 1)..(brick.last.end + 1))
-    pending_brick = brick.clone
-    pending_brick[2] = new_z_range
-
-    its_supporting = zs[z + 1].filter{|subbrick| pending_brick.zip(subbrick).map{ intersect(_1, _2) }.all? && subbrick != brick}
-    its_supporting.filter!{ |supported_brick|
-        new_support_z_range = (supported_brick.last.begin - 1)..((supported_brick.last.end - 1))
-        pending_support_brick = supported_brick.clone
-        pending_support_brick[2] = new_support_z_range
-
-        # Don't include the brick to be removed or the subbrick itself
-        zs[z].reject{ _1 == brick || _1 == supported_brick}.none?{ |subbrick|
-            pending_support_brick.zip(subbrick).map{ intersect(_1, _2) }.all?
-        }
-    }
-
-    num_supported = its_supporting.length
-    new_zs = zs.clone
-    new_zs[z]
-    its_supporting.each{|supported_brick| num_supported += get_supported(supported_brick, zs, cache)}
-
-    return num_supported
-
-    # cache[brick] = num_supported
-
-    # return cache[brick]
-end
-
 def day22_2
     grid = Hash.new(?.)
     zs = Hash.new([])
@@ -137,14 +104,31 @@ def day22_2
         bricks_final << brick
     end
 
-    cache = {}
-    # bricks_final.reverse!
+    og_zs = zs
 
-    bricks_final.map { |brick|
-        get_supported(brick, zs, cache)
+    bricks_final.map { |brick_to_remove|
+        bricks_moved = 0
+        bricks = bricks_final.clone
+        bricks.delete(brick_to_remove)
+        zs = {}
+        og_zs.each{|k, v| zs[k] = v.clone}
+        zs.each{ |_, v| v.delete(brick_to_remove) }
+
+        brick = 0
+        until bricks.empty?
+            brick = bricks.shift
+            bottom_z = brick.last.begin
+            new_z_range = (brick.last.begin - 1)..((brick.last.end - 1))
+            pending_brick = brick.clone
+            pending_brick[2] = new_z_range
+
+            unless (bottom_z == 1 || zs[bottom_z - 1].any?{|subbrick| pending_brick.zip(subbrick).map{ intersect(_1, _2) }.all? })
+                brick.last.each{|zr| zs[zr].delete(brick) }
+                bricks_moved += 1
+            end
+        end
+        bricks_moved
     }.sum
-    # cache.sort_by{|k, _| k.last.begin }
-    # zs
 end
 
 pp day22_1
