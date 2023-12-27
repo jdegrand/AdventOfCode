@@ -50,6 +50,7 @@ end
 
 def get_accepted(workflow, workflows, values, accepted)
     if workflow == ?A
+        # pp values
         accepted << values.values.map(&:size).inject(:*)
         return
     elsif workflow == ?R

@@ -131,7 +131,9 @@ def day21_2
     }
     evens.size
     # dp
-    borders.map{ [_1, dp[_1]]}
+    borders.map{ [_1, dp[_1]] }
+    visited
+    borders.filter{_1[1] == 0 }.sort.map{ dp[_1] }.join(?-)
 end
 
 # pp day21_1
