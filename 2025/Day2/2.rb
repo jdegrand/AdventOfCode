@@ -24,7 +24,7 @@ def day2_2
         si, ei = l.split(?-).map(&:to_i)
         (si..ei).reduce(0){ |acc, n|
             nc = n.to_s.chars
-            (1..(nc.length / 2)).find{ |i| nc.length % i == 0 && nc.each_slice(i).uniq.size == 1 } ? acc + n : acc
+            (1..(nc.length / 2)).any?{ |i| nc.length % i == 0 && nc.each_slice(i).uniq.size == 1 } ? acc + n : acc
         }
     }
 end
