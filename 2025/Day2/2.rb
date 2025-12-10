@@ -22,17 +22,10 @@ end
 def day2_2
     $lines[0].split(?,).sum{ |l|
         si, ei = l.split(?-).map(&:to_i)
-        repeating = Set.new
-        (si..ei).each{ |n|
+        (si..ei).reduce(0){ |acc, n|
             nc = n.to_s.chars
-            (1..(nc.length / 2)).each{ |i|
-                if nc.length % i == 0 &&  nc.each_slice(i).uniq.size == 1
-                    repeating << n
-                    break
-                end
-            }
+            (1..(nc.length / 2)).find{ |i| nc.length % i == 0 && nc.each_slice(i).uniq.size == 1 } ? acc + n : acc
         }
-        repeating.sum
     }
 end
 
